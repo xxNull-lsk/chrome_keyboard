@@ -1,0 +1,13 @@
+[Unit]
+Description=change chrome keyboard layout to pc, such as F1~F12 
+After=syslog.target network.target remote-fs.target nss-lookup.target
+
+[Service]
+Type=simple
+ExecStart=/sbin/chrome_keyboard
+# ExecReload=target_dir/restart.sh 
+# ExecStop=target_dir/shutdown.sh
+SuccessExitStatus=0
+
+[Install]
+WantedBy=multi-user.target
