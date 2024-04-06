@@ -20,6 +20,9 @@ target_link_libraries(${PROJECT_NAME} ${ZMQ_LIBRARIES} pthread)
 install(TARGETS ${PROJECT_NAME} OBJECTS DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 
 
-add_executable(watch_keyboard src/watch_keyboard.cpp)
 add_executable(chrome_keyboard_tray src/chrome_keyboard_tray.cpp)
 target_link_libraries(chrome_keyboard_tray ${GTK_LIBRARIES} ${ZMQ_LIBRARIES} pthread)
+
+
+add_executable(watch_keyboard src/watch_keyboard.cpp)
+add_executable(view_keyboard src/view_keyboard.cpp)

@@ -111,12 +111,11 @@ int get_keycode(int scancode)
     int fd, i;
     unsigned int buf[2];
 
-    fprintf(stderr, "get_keyboard_type\n");
     fd = open(kbd_event_file, O_RDWR);
     if (fd < 0)
     {
         fprintf(stderr, "open: %s (%s)\n", kbd_event_file, strerror(errno));
-        return CK_KEYBOARD_UNKOWN;
+        return -1;
     }
     buf[0] = scancode;
     buf[1] = 0;
@@ -125,7 +124,7 @@ int get_keycode(int scancode)
         fprintf(stderr, "ioctl: %x -> %u (%s)\n", buf[0], buf[1],
                 strerror(errno));
         close(fd);
-        return CK_KEYBOARD_UNKOWN;
+        return -1;
     }
     close(fd);
     return buf[1];
@@ -133,14 +132,31 @@ int get_keycode(int scancode)
 
 CK_KEYBOARD_TYPE get_keyboard_type()
 {
-    if (get_keycode(pc_keys[0].scancode) == pc_keys[0].keycode)
+    bool is_pc = true, is_chrome = true;
+    for (int i = 0; i < sizeof(pc_keys) / sizeof(pc_keys[0]); i++)
     {
+        auto keycode = get_keycode(pc_keys[i].scancode);
+        if (keycode != pc_keys[i].keycode)
+        {
+            is_pc = false;
+        }
+        if (keycode != chrome_keys[i].keycode)
+        {
+            is_chrome = false;
+        }
+    }
+
+    if (is_pc)
+    {
+        fprintf(stderr, "get_keyboard_type CK_KEYBOARD_PC\n");
         return CK_KEYBOARD_PC;
     }
-    else if (get_keycode(chrome_keys[0].scancode) == chrome_keys[0].keycode)
+    else if (is_chrome)
     {
+        fprintf(stderr, "get_keyboard_type CK_KEYBOARD_CHROME\n");
         return CK_KEYBOARD_CHROME;
     }
+    fprintf(stderr, "get_keyboard_type CK_KEYBOARD_UNKOWN\n");
     return CK_KEYBOARD_UNKOWN;
 }
 
