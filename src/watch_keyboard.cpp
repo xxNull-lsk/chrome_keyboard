@@ -6,7 +6,7 @@
 #include <string.h>
 #include <unistd.h>
 
-static const char *kbd_event_file = "/dev/input/event2";
+static const char *g_kbd_event_file = "/dev/input/event2";
 unsigned int scancode2keycode(int fd, unsigned int scancode)
 {
     unsigned int buf[2] = {scancode, 0};
@@ -16,10 +16,10 @@ unsigned int scancode2keycode(int fd, unsigned int scancode)
 
 int main()
 {
-    int fd = open(kbd_event_file, O_RDWR);
+    int fd = open(g_kbd_event_file, O_RDWR);
     if (fd < 0)
     {
-        fprintf(stderr, "open: %s (%s)\n", kbd_event_file, strerror(errno));
+        fprintf(stderr, "open: %s (%s)\n", g_kbd_event_file, strerror(errno));
         return 1;
     }
     // 通过ioctl读取键盘映射

@@ -8,7 +8,7 @@
 #include <unistd.h>
 #include "ck_types.h"
 
-static const char *kbd_event_file = "/dev/input/event2";
+static const char *g_kbd_event_file = "/dev/input/event2";
 typedef struct
 {
     unsigned int scancode;
@@ -111,10 +111,10 @@ int get_keycode(int scancode)
     int fd, i;
     unsigned int buf[2];
 
-    fd = open(kbd_event_file, O_RDWR);
+    fd = open(g_kbd_event_file, O_RDWR);
     if (fd < 0)
     {
-        fprintf(stderr, "open: %s (%s)\n", kbd_event_file, strerror(errno));
+        fprintf(stderr, "open: %s (%s)\n", g_kbd_event_file, strerror(errno));
         return -1;
     }
     buf[0] = scancode;
@@ -166,10 +166,10 @@ int switch_to_pc_mode()
     int fd, i;
     unsigned int buf[2];
     const int nkeys = sizeof(pc_keys) / sizeof(pc_keys[0]);
-    fd = open(kbd_event_file, O_RDWR);
+    fd = open(g_kbd_event_file, O_RDWR);
     if (fd < 0)
     {
-        fprintf(stderr, "open: %s (%s)\n", kbd_event_file, strerror(errno));
+        fprintf(stderr, "open: %s (%s)\n", g_kbd_event_file, strerror(errno));
         return 1;
     }
     // 通过ioctl更改键盘映射
@@ -186,7 +186,7 @@ int switch_to_pc_mode()
     // 使用udevadm使键盘映射生效
     {
         char cmd[128];
-        sprintf(cmd, "udevadm trigger %s", kbd_event_file);
+        sprintf(cmd, "udevadm trigger %s", g_kbd_event_file);
         system(cmd);
     }
     save_setting(CK_KEYBOARD_PC);
@@ -200,10 +200,10 @@ int switch_to_chromebook_mode()
     int fd, i;
     unsigned int buf[2];
     const int nkeys = sizeof(chrome_keys) / sizeof(chrome_keys[0]);
-    fd = open(kbd_event_file, O_RDWR);
+    fd = open(g_kbd_event_file, O_RDWR);
     if (fd < 0)
     {
-        fprintf(stderr, "open: %s (%s)\n", kbd_event_file, strerror(errno));
+        fprintf(stderr, "open: %s (%s)\n", g_kbd_event_file, strerror(errno));
         return 1;
     }
     // 通过ioctl更改键盘映射
@@ -220,7 +220,7 @@ int switch_to_chromebook_mode()
     // 使用udevadm使键盘映射生效
     {
         char cmd[128];
-        sprintf(cmd, "udevadm trigger %s", kbd_event_file);
+        sprintf(cmd, "udevadm trigger %s", g_kbd_event_file);
         system(cmd);
     }
     save_setting(CK_KEYBOARD_CHROME);

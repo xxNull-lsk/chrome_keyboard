@@ -6,7 +6,7 @@
 #include <string.h>
 #include <unistd.h>
 
-static const char *kbd_event_file = "/dev/input/event1";
+static char g_kbd_event_file[1024] = "/dev/input/event1";
 typedef struct
 {
     unsigned int scancode;
@@ -55,10 +55,10 @@ int get_keycode(int scancode)
     int fd, i;
     unsigned int buf[2];
 
-    fd = open(kbd_event_file, O_RDWR);
+    fd = open(g_kbd_event_file, O_RDWR);
     if (fd < 0)
     {
-        fprintf(stderr, "open: %s (%s)\n", kbd_event_file, strerror(errno));
+        fprintf(stderr, "open: %s (%s)\n", g_kbd_event_file, strerror(errno));
         return -1;
     }
     buf[0] = scancode;
@@ -74,9 +74,42 @@ int get_keycode(int scancode)
     return buf[1];
 }
 
-int main()
+void select_device()
 {
-    printf("scancode: keycode(pc, chrome)\n");
+    int count = 0;
+    while (count < 9999)
+    {
+        char filename[256];
+        sprintf(filename, "/dev/input/event%d", count++);
+        if (access(filename, F_OK) < 0)
+        {
+            break;
+        }
+        int fd = open(filename, O_RDWR);
+        if (fd < 0)
+        {
+            continue;
+        }
+        char device_name[128] = {0};
+        if (ioctl(fd, EVIOCGNAME(128), device_name) < 0)
+        {
+            fprintf(stderr, "ioctl failed!%s\n", strerror(errno));
+            close(fd);
+            continue;
+        }
+        close(fd);
+        printf("[%d]: %s %s\n", count - 1, filename, device_name);
+    }
+    printf("input device index[0~%d]:", count - 2);
+    int index = 0;
+    fscanf(stdin, "%d", &index);
+    sprintf(g_kbd_event_file, "/dev/input/event%d", index);
+}
+
+int main(int argc, char *argv[])
+{
+    select_device();
+    printf("%s\nscancode: keycode(pc, chrome)\n", g_kbd_event_file);
     for (int i = 0; i < sizeof(pc_keys) / sizeof(pc_keys[0]); i++)
     {
         auto k = pc_keys[i];
