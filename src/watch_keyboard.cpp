@@ -6,7 +6,7 @@
 #include <string.h>
 #include <unistd.h>
 
-static const char *kbd_event_file = "/dev/input/event3";
+static const char *kbd_event_file = "/dev/input/event2";
 unsigned int scancode2keycode(int fd, unsigned int scancode)
 {
     unsigned int buf[2] = {scancode, 0};

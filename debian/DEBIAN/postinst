@@ -1,0 +1,8 @@
+#!/bin/sh
+#chmod 0700 -R /opt/chrome_keyboard
+
+systemctl daemon-reload
+systemctl enable chrome_keyboard.service
+systemctl start chrome_keyboard.service
+
+exit 0

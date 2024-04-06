@@ -1,0 +1,8 @@
+Package: chrome-keyboard
+Version: 0.0.0
+Section: utils
+Priority: standard
+Architecture: unknown
+Depends: libc6 (>= 2.14), libzmq5, libgtk-3-0
+Maintainer: xxnull@163.com
+Description: switch keyboard for chromebook package
