@@ -1,4 +1,4 @@
-这是一个用于将chromebook的键盘布局改为普通PC的键盘布局的工具。
+这是一个用于将HP C1030的键盘布局改为普通PC的键盘布局的工具。
 
 # chrome布局
 - 托盘图标显示为![chromebook](./res/chromebook.png)

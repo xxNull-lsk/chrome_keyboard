@@ -106,7 +106,7 @@ bool publish_msg(int id, int value)
     return true;
 }
 
-CK_KEYBOARD_TYPE get_keyboard_type()
+int get_keycode(int scancode)
 {
     int fd, i;
     unsigned int buf[2];
@@ -118,7 +118,7 @@ CK_KEYBOARD_TYPE get_keyboard_type()
         fprintf(stderr, "open: %s (%s)\n", kbd_event_file, strerror(errno));
         return CK_KEYBOARD_UNKOWN;
     }
-    buf[0] = pc_keys[i].scancode;
+    buf[0] = scancode;
     buf[1] = 0;
     if (ioctl(fd, EVIOCGKEYCODE, buf) < 0)
     {
@@ -127,7 +127,21 @@ CK_KEYBOARD_TYPE get_keyboard_type()
         close(fd);
         return CK_KEYBOARD_UNKOWN;
     }
-    return (buf[1] == KEY_F1) ? CK_KEYBOARD_PC : CK_KEYBOARD_CHROME;
+    close(fd);
+    return buf[1];
+}
+
+CK_KEYBOARD_TYPE get_keyboard_type()
+{
+    if (get_keycode(pc_keys[0].scancode) == pc_keys[0].keycode)
+    {
+        return CK_KEYBOARD_PC;
+    }
+    else if (get_keycode(chrome_keys[0].scancode) == chrome_keys[0].keycode)
+    {
+        return CK_KEYBOARD_CHROME;
+    }
+    return CK_KEYBOARD_UNKOWN;
 }
 
 int switch_to_pc_mode()
@@ -283,6 +297,11 @@ bool start_listener(void *context)
 
 int main()
 {
+    if (get_keyboard_type() == CK_KEYBOARD_UNKOWN)
+    {
+        fprintf(stderr, "ERROR: Your laptop type does not match. Unable to use this program.\n");
+        return 1;
+    }
     void *context = zmq_ctx_new();
     switch (load_setting())
     {
