@@ -29,8 +29,8 @@ static KeyConfig pc_keys[] = {
     {0xae, KEY_F12},    // 音量降低       ==> F12
     {0xb0, KEY_INSERT}, // 音量提升       ==> Insert
     {0x5d, KEY_DELETE}, // 休眠          ==> Delete
-    {0xb8, KEY_HOME},   // 右Ctrl        ==> Home
-    {0x9d, KEY_END},    // 右Alt         ==> End
+    {0x9d, KEY_HOME},   // 右Ctrl        ==> Home
+    {0xb8, KEY_END},    // 右Alt         ==> End
 };
 
 static KeyConfig chrome_keys[] = {
@@ -48,8 +48,8 @@ static KeyConfig chrome_keys[] = {
     {0xae, KEY_VOLUMEDOWN},     // 音量降低
     {0xb0, KEY_VOLUMEUP},       // 音量提升
     {0x5d, KEY_SLEEP},          // 休眠
-    {0xb8, KEY_RIGHTCTRL},      // 右Ctrl
-    {0x9d, KEY_RIGHTALT},       // 右Alt
+    {0x9d, KEY_RIGHTCTRL},      // 右Ctrl
+    {0xb8, KEY_RIGHTALT},       // 右Alt
 };
 
 static void *g_socket_pub = nullptr;
@@ -136,13 +136,15 @@ CK_KEYBOARD_TYPE get_keyboard_type()
     for (int i = 0; i < sizeof(pc_keys) / sizeof(pc_keys[0]); i++)
     {
         auto keycode = get_keycode(pc_keys[i].scancode);
-        if (keycode != pc_keys[i].keycode)
+        if (is_pc && keycode != pc_keys[i].keycode)
         {
             is_pc = false;
+            fprintf(stderr, "get_keyboard_type not pc. scancode:0x%02x keycode:%d != %d\n", pc_keys[i].scancode, keycode, pc_keys[i].keycode);
         }
-        if (keycode != chrome_keys[i].keycode)
+        if (is_chrome && keycode != chrome_keys[i].keycode)
         {
             is_chrome = false;
+            fprintf(stderr, "get_keyboard_type not chrome. scancode:0x%02x keycode:%d != %d\n", pc_keys[i].scancode, keycode, pc_keys[i].keycode);
         }
     }
 

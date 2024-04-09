@@ -6,7 +6,7 @@
 #include <string.h>
 #include <unistd.h>
 
-static const char *g_kbd_event_file = "/dev/input/event2";
+static char g_kbd_event_file[256] = "/dev/input/event2";
 unsigned int scancode2keycode(int fd, unsigned int scancode)
 {
     unsigned int buf[2] = {scancode, 0};
@@ -14,8 +14,41 @@ unsigned int scancode2keycode(int fd, unsigned int scancode)
     return buf[1];
 }
 
+void select_device()
+{
+    int count = 0;
+    while (count < 9999)
+    {
+        char filename[256];
+        sprintf(filename, "/dev/input/event%d", count++);
+        if (access(filename, F_OK) < 0)
+        {
+            break;
+        }
+        int fd = open(filename, O_RDWR);
+        if (fd < 0)
+        {
+            return;
+        }
+        char device_name[128] = {0};
+        if (ioctl(fd, EVIOCGNAME(128), device_name) < 0)
+        {
+            fprintf(stderr, "ioctl failed!%s\n", strerror(errno));
+            close(fd);
+            continue;
+        }
+        close(fd);
+        printf("[%d]: %s %s\n", count - 1, filename, device_name);
+    }
+    printf("input device index[0~%d]:", count - 2);
+    int index = 0;
+    fscanf(stdin, "%d", &index);
+    sprintf(g_kbd_event_file, "/dev/input/event%d", index);
+}
+
 int main()
 {
+    select_device();
     int fd = open(g_kbd_event_file, O_RDWR);
     if (fd < 0)
     {
